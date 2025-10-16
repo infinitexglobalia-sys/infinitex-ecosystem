@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Backend FastAPI
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/infinitex
+      - REDIS_URL=redis://redis:6379
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - MANUS_API_KEY=${MANUS_API_KEY}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  # PostgreSQL
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=infinitex
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Redis
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # Frontend React (opcional para desarrollo)
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+
+volumes:
+  postgres_data:
+  redis_data:
